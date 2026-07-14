@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CekBio - Login</title>
+  <style>
+    :root {
+  --bg: #09090B;
+  --card: #111113;
+  --border: rgba(255,255,255,.08);
+  --accent: #5B8CFF;
+  --hover: #7AA4FF;
+  --text: #FFFFFF;
+  --muted: #9CA3AF;
+  --radius: 18px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+.auth-container { background: var(--card); border: 1px solid var(--border); padding: 2.5rem; width: 100%; max-width: 420px; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: all 0.3s ease; }
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.025em; margin-bottom: 0.5rem; }
+p.subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+.form-group { margin-bottom: 1.25rem; }
+label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; font-weight: 500; }
+input { width: 100%; background: #18181B; border: 1px solid var(--border); padding: 0.85rem 1rem; border-radius: 12px; color: var(--text); font-size: 0.95rem; transition: border-color 0.2s; }
+input:focus { outline: none; border-color: var(--accent); }
+button { width: 100%; background: var(--accent); color: #000; font-weight: 600; border: none; padding: 0.85rem; border-radius: 12px; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+button:hover { background: var(--hover); }
+button:active { transform: scale(0.98); }
+.auth-link { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted); }
+.auth-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.auth-link a:hover { text-decoration: underline; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #1E1E24; border: 1px solid var(--border); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <h1>Selamat Datang</h1>
+    <p class="subtitle">Masuk untuk mengelola tools WhatsApp Bio Checker Anda.</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <button type="submit">Masuk Aplikasi</button>
+    </form>
+    <div class="auth-link">
+      Belum punya akun? <a href="/regis.html">Daftar sekarang</a>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const toast = document.getElementById('toast');
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.message || 'Gagal login');
+        localStorage.setItem('token', data.token);
+        window.location.href = '/index.html';
+      } catch(err) {
+        toast.textContent = err.message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+    });
+  </script>
+</body>
+</html>
